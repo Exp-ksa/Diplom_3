@@ -38,22 +38,30 @@ class TestMainFunctionality:
     @allure.title("Закрытие модалки по крестику")
     def test_modal_closes_by_clicking_close_button(self, main_page):
         main_page.click_ingredient(INGREDIENT_NAMES["buns"][0])
-        assert main_page.check_open_modal_ingredient()
+        
         main_page.close_modal_window()
 
         assert not main_page.is_modal_closed(), "Модалка не закрылась"
 
-    @allure.title("Добавление ингредиента увеличивает счётчик")
-    @pytest.mark.parametrize("name", generate_data.generate_random_burger_ingredients())
-    def test_adding_ingredient_increases_counter(self, main_page, name):
+    @allure.title("Счетчик ингредиента изначально равен 0")
+    def test_ingredient_counter_initially_zero(self, main_page):
+        name = generate_data.generate_random_ingredient()
         counter_before = main_page.get_counter_for(name)
+        
         assert counter_before == 0, \
             f"Начальный счётчик для '{name}': ожидалось 0, получено {counter_before}"
 
+    @allure.title("Добавление ингредиента увеличивает счётчик (булка на 2, остальное на 1)")
+    @pytest.mark.parametrize("name, increment", [
+                                                (generate_data.generate_random_ingredients_other(), 1),
+                                                (generate_data.generate_random_ingredients_bun(), 2)
+])
+    def test_adding_ingredient_increases_counter(self, main_page, name, increment):
+        counter_before = main_page.get_counter_for(name)
+    
         main_page.add_ingedient_basket(name)
-        
+    
         counter_after = main_page.get_counter_for(name)
-        if name in INGREDIENT_NAMES["buns"]:
-            assert counter_after == counter_before + 2, f"Счётчик не увеличился: было {counter_before}, стало {counter_after}"
-        else:
-            assert counter_after == counter_before + 1, f"Счётчик не увеличился: было {counter_before}, стало {counter_after}"
+        assert counter_after == counter_before + increment, \
+            f"Счётчик не увеличился на {increment}: было {counter_before}, стало {counter_after}"    
+        

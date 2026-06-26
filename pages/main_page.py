@@ -42,7 +42,6 @@ class MainPage(BasePage):
     def close_modal_window(self):
         self.wait_for_element_visible(ModalLocators.MODAL_CONTAINER)
         self.click_element_js(ModalLocators.MODAL_CLOSE_BUTTON)
-        #self.wait_for_element_invisible(ModalLocators.MODAL_OVERLAY)
         
 
     @allure.step("Проверить, что модальное окно закрыто")
